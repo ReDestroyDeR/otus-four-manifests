@@ -8,16 +8,16 @@ spec:
     matchLabels:
       app: business
   action: ALLOW 
-  rules:
-    - to:
-        - operation:
-            methods:
-              - "POST"
-              - "GET"
-              - "PATCH"
-              - "DELETE"
-            paths:
-              - "/"
+  rules: {}
+#   - to:
+#      - operation:
+#           methods:
+#              - "POST"
+#              - "GET"
+#              - "PATCH"
+#              - "DELETE"
+#            paths:
+#              - "/"
 #      when:
 #        - key: request.auth.claims[iss]
 #          values: 

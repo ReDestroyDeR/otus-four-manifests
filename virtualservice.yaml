@@ -1,11 +1,11 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: otus-four-virtual-service
+  name: auth-virtual-service
   namespace: otus-four
 spec:
   hosts:
-    - arch.homework
+    - arch.homework 
   gateways:
     - otus-four-gateway 
   http:
@@ -22,9 +22,9 @@ spec:
             host: auth-service.otus-four.svc.cluster.local
             subset: v1
     - name: "business-routes"
-      match:
-        - uri:
-            exact: "/"
+      # match:
+      #   - uri:
+      #       exact: "/"
       route:
         - destination:
             host: business-service.otus-four.svc.cluster.local
