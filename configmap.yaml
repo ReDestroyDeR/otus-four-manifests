@@ -1,0 +1,31 @@
+# Auth Config
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: auth-config
+    namespace: otus-four
+
+data:
+  POSTGRES_URI: "postgres-postgresql"
+  POSTGRES_PORT: "5432"
+  JWT_CLAIMS_EXP_MINUTES: "30"
+  AUTH_SECURITY_SALT: "32"
+  AUTH_SECURITY_BCRYPT_STRENGTH: "10"
+  SPRINGFOX_DOCUMENTATION_SWAGGER-UI_BASE-URL: "/documentation"
+  EXTERNAL_BUSINESS_URL: "business-service"
+  EXTERNAL_BUSINESS_ENDPOINTS_CREATE: "/user"
+
+---
+
+# Business Config
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: business-config
+    namespace: otus-four
+
+data:
+    POSTGRES_URI: "postgres-postgresql"
+    POSTGRES_PORT: "5432"

@@ -1,0 +1,76 @@
+# Authentication Service
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication-service-deployment
+  namespace: otus-four
+  labels:
+    app: authentication
+    version: v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: authentication
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: authentication
+        version: v1
+    spec:
+      containers:
+        - name: authentication-service
+          image: redestroyder/authorization-service:0.0.2
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: auth-secret
+            - configMapRef:
+                name: auth-config
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+
+---
+
+# Business Service
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: business-service-deployment
+  namespace: otus-four
+  labels:
+    app: business
+    version: v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: business
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: business
+        version: v1
+    spec:
+      containers:
+        - name: business-service
+          image: redestroyder/business-service:0.0.1
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: business-secret
+            - configMapRef:
+                name: business-config
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+
+

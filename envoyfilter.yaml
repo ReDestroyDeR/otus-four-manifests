@@ -1,0 +1,36 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: business-jwt-subject-filter
+  namespace: otus-four
+spec:
+  workloadSelector:
+    labels:
+      app: business
+
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: SIDECAR_INBOUND
+        listener:
+          portNumber: 8080
+          filterChain:
+            name: "envoy.filters.http.jwt_authn"
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: jwt.lua
+          typed_config:
+            "@type": "type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua"
+            inlineCode: |
+              function envoy_on_request(request_handle)
+                # get subject from jwt
+                request_handle:logInfo("Start Request Handle")
+                # request_handle:logInfo(request_handle:dynamicMetadata:get("envoy.filters.http.jwt_authn"))
+                # request_handle:logInfo(request_handle:dynamicMetadata:get("envoy.filters.http.jwt_authn"))["from_headers"]
+                # get target query param id / username
+                # check if username (jwt subject) matches
+                # true  - allow & forward to service
+                # false - deny  403 FORBIDDEN
+              end
+

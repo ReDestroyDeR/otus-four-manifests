@@ -1,0 +1,49 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: otus-four-authorization-policy-jwt
+  namespace: otus-four
+spec:
+  selector:
+    matchLabels:
+      app: business
+  action: ALLOW 
+  rules:
+    - to:
+        - operation:
+            methods:
+              - "POST"
+              - "GET"
+              - "PATCH"
+              - "DELETE"
+            paths:
+              - "/"
+#      when:
+#        - key: request.auth.claims[iss]
+#          values: 
+#            - "auth.arch.homework"
+
+---
+
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: otus-four-authentication-service-policy
+  namespace: otus-four
+spec:
+  selector:
+    matchLabels:
+      app: authentication
+  action: ALLOW
+  rules:
+    - to:
+        - operation:
+            methods:
+              - "POST"
+              - "GET"
+            paths:
+              - "/register"
+              - "/login"
+              - "/public-key"
+      # We do not specify source since it can be anyone
+

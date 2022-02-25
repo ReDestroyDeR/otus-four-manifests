@@ -1,0 +1,19 @@
+primary:
+  initdb:
+    scripts:
+        test.sh: |
+            #!/bin/sh
+            echo "Hello world!"
+
+        init.sql: |
+            CREATE USER business WITH PASSWORD 'business'; 
+            CREATE USER auth WITH PASSWORD 'auth';
+            CREATE DATABASE business;
+            CREATE DATABASE authentication; 
+            GRANT ALL PRIVILEGES ON DATABASE business TO business;
+            GRANT ALL PRIVILEGES ON DATABASE authentication TO auth;
+
+auth:
+  username: "postgres"
+  password: "postgres"
+
