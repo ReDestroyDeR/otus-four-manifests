@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: auth-virtual-service
+  name: otus-four-virtual-service
   namespace: otus-four
 spec:
   hosts:
