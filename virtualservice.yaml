@@ -13,18 +13,42 @@ spec:
       match:
         - uri:
             prefix: "/register"
+          method:
+            exact: "POST"
         - uri:
-            prefix: "/login"
+            prefix: "/login" 
+          method:
+            exact: "POST"
         - uri:
-            prefix: "/public-key"
+            prefix: "/change-username"
+          method:
+            exact: "PATCH"
+        - uri:
+            prefix: "/change-password"
+          method:
+            exact: "PATCH"
+        - uri:
+            prefix: "/delete"
+          method:
+            exact: "DELETE"
+        - uri:
+            prefix: "/.well-known/jwks.json"
+          method:
+            exact: "GET"
       route:
         - destination:
             host: auth-service.otus-four.svc.cluster.local
             subset: v1
     - name: "business-routes"
-      # match:
-      #   - uri:
-      #       exact: "/"
+      match:
+        - method:
+            exact: "GET"
+        - method:
+            exact: "PATCH"
+        - method:
+            exact: "DELETE"
+        - uri:
+            exact: "/"
       route:
         - destination:
             host: business-service.otus-four.svc.cluster.local

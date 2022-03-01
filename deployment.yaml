@@ -1,6 +1,5 @@
 # Authentication Service
 
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,8 +22,8 @@ spec:
     spec:
       containers:
         - name: authentication-service
-          image: redestroyder/authorization-service:0.0.2
-          imagePullPolicy: IfNotPresent
+          image: redestroyder/authorization-service:0.1.2
+          imagePullPolicy: Always 
           envFrom:
             - secretRef:
                 name: auth-secret
@@ -61,7 +60,7 @@ spec:
     spec:
       containers:
         - name: business-service
-          image: redestroyder/business-service:0.0.1
+          image: redestroyder/business-service:0.0.2
           imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef:
