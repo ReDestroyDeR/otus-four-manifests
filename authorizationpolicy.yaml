@@ -9,8 +9,7 @@ spec:
       app: business
   jwtRules:
     - issuer: "auth.arch.homework"
-      # jwksUri: "http://auth-service.otus-four.svc.cluster.local/.well-known/jwks.json"
-      jwksUri: "https://gist.githubusercontent.com/ReDestroyDeR/de79293b46575df5d41641c5e20a07f2/raw/a2d273e354577925f6287322007a45d611dbe3ec/jwks.json"
+      jwksUri: "http://auth-service.otus-four.svc.red.kube/.well-known/jwks.json"
 ---
 
 apiVersion: security.istio.io/v1beta1
