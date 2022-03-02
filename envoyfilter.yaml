@@ -42,7 +42,8 @@ spec:
                   local jsonString = tostring(body:getBytes(0, body:length()))
                   body_username = json:decode(jsonString).username
                 end
-                request_handle:logWarn("Body Username: "..body_username)
+              
+                request_handle:logTrace("Body Username: "..body_username)
                 
                 -- get username from query param 
                 local path = request_handle:headers():get(":path")
@@ -53,7 +54,7 @@ spec:
                   query_username = string.sub(first_match, 11, -1)
                 end
               
-                request_handle:logWarn("Query Username: "..query_username)
+                request_handle:logTrace("Query Username: "..query_username)
                 
                 -- check if usernames (jwt subject) don't matches
                 if (subject ~= query_username and subject ~= body_username) then
