@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: authentication-service
-          image: redestroyder/authorization-service:0.1.2
+          image: redestroyder/authorization-service:0.1.3
           imagePullPolicy: Always 
           envFrom:
             - secretRef:
@@ -83,7 +83,7 @@ spec:
     spec:
       containers:
         - name: business-service
-          image: redestroyder/business-service:0.0.2
+          image: redestroyder/business-service:0.0.3
           imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef:
