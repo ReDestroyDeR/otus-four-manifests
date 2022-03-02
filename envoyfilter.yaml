@@ -14,8 +14,11 @@ spec:
         context: SIDECAR_INBOUND
         listener:
           portNumber: 8080
-          filterChain:
-            name: "envoy.filters.http.jwt_authn"
+          filterChain: 
+            filter:
+              name: "envoy.filters.network.http_connection_manager"
+              subFilter:
+                name: "envoy.filters.http.router"
       patch:
         operation: INSERT_BEFORE
         value:
@@ -23,14 +26,40 @@ spec:
           typed_config:
             "@type": "type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua"
             inlineCode: |
+              local json = require("json")
+              
               function envoy_on_request(request_handle)
-                # get subject from jwt
-                request_handle:logInfo("Start Request Handle")
-                # request_handle:logInfo(request_handle:dynamicMetadata:get("envoy.filters.http.jwt_authn"))
-                # request_handle:logInfo(request_handle:dynamicMetadata:get("envoy.filters.http.jwt_authn"))["from_headers"]
-                # get target query param id / username
-                # check if username (jwt subject) matches
-                # true  - allow & forward to service
-                # false - deny  403 FORBIDDEN
+                -- get subject from jwt
+                local meta = request_handle:streamInfo():dynamicMetadata():get("envoy.filters.http.jwt_authn")
+                local claims = meta["auth.arch.homework"]
+                local subject = claims.sub
+                request_handle:logTrace("Subject: "..subject)
+              
+                -- get username from body
+                local body = request_handle:body()
+                local body_username = ""
+                if (body ~= nil) then
+                  local jsonString = tostring(body:getBytes(0, body:length()))
+                  body_username = json:decode(jsonString).username
+                end
+                request_handle:logWarn("Body Username: "..body_username)
+                
+                -- get username from query param 
+                local path = request_handle:headers():get(":path")
+                request_handle:logTrace("Path: "..path)
+                local query_username = ""
+                local first_match = string.match(path, "%?username=[^&]+")
+                if (first_match ~= nil) then
+                  query_username = string.sub(first_match, 11, -1)
+                end
+              
+                request_handle:logWarn("Query Username: "..query_username)
+                
+                -- check if usernames (jwt subject) don't matches
+                if (subject ~= query_username and subject ~= body_username) then
+                  request_handle:logTrace("Usernames don't match")
+                  request_handle:respond({[":status"] = 403}, "Not authorized to access target resource")                  
+                else
+                  request_handle:logTrace("Usernames match")
+                end
               end
-
