@@ -57,6 +57,29 @@ spec:
       labels:
         app: business
         version: v1
+      annotations:
+        sidecar.istio.io/userVolume: '
+          {
+            "lua-libs": {
+              "configMap": {
+                "name": "lua-libs",
+                "items": [
+                  {
+                    "key": "json.lua",
+                    "path": "json.lua"
+                  }
+                ]
+              }
+            }
+          }'
+        sidecar.istio.io/userVolumeMount: '
+          {
+            "lua-libs": {
+              "mountPath": "/usr/local/share/lua/5.1",
+              "readOnly": true
+            }
+          }'
+  
     spec:
       containers:
         - name: business-service
