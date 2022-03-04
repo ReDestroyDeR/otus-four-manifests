@@ -41,8 +41,6 @@ spec:
             exact: "GET"
         - method:
             exact: "PATCH"
-        - method:
-            exact: "DELETE"
         - uri:
             exact: "/"
       route:
