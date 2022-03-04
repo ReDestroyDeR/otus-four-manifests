@@ -34,6 +34,12 @@ helm install istio-ingress istio/gateway -n istio-ingress --wait
 **!!!** *EnvoyFilter may not be working due to long startup time of Authentication Service, so feel free to 
 `kubectl rollout restart -n istio-system dep/istiod`*
 
+### How to change Public/Private JWT Keypair?
+1. Run `generate-keys.sh`
+2. Open `keys.env`
+3. Copy `JWT_PRIVATE_KEY` and `JWT_PUBLIC_KEY`
+4. Paste them accordingly to `secret.yaml`
+
 ## Sequence Diagrams describing Flow
 
 ### Registration
