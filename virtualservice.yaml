@@ -22,11 +22,11 @@ spec:
         - uri:
             prefix: "/change-username"
           method:
-            exact: "PATCH"
+            exact: "POST"
         - uri:
             prefix: "/change-password"
           method:
-            exact: "PATCH"
+            exact: "POST"
         - uri:
             prefix: "/delete"
           method:
