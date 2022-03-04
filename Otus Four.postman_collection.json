@@ -1,0 +1,514 @@
+{
+	"info": {
+		"_postman_id": "c44623e2-bf4f-4fa9-94ff-8fbcd2305aa0",
+		"name": "Otus Four",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register a user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success\", function() {",
+							"    pm.expect(pm.response.code).to.eq(200)",
+							"})",
+							"",
+							"postman.setNextRequest(\"Login as user\")",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set('username', pm.variables.replaceIn('{{$randomUserName}}'))",
+							"pm.environment.set('password', pm.variables.replaceIn('{{$randomPassword}}'))"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host.url}}/register",
+					"host": [
+						"{{host.url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login as user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Expect to get a JWT\", function() {",
+							"    pm.expect(pm.response.code).eq(200)",
+							"    pm.environment.set('jwttoken', pm.response.text())",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host.url}}/login",
+					"host": [
+						"{{host.url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Info About Yourself",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success\", function() {",
+							"    pm.expect(pm.response.code).eq(200)",
+							"})",
+							"",
+							"pm.test(\"Not allowed to see different user\", function() {",
+							"    pm.sendRequest(pm.collectionVariables.get(\"host.url\") + \"/?username=\" + pm.variables.replaceIn(\"{{$randomUserName}}\"), (error, response) => {",
+							"        pm.expect(response.code).eq(403)",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host.url}}/?username={{username}}",
+					"host": [
+						"{{host.url}}"
+					],
+					"path": [
+						""
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "{{username}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success\", function() {",
+							"    pm.expect(pm.response.code).eq(200)",
+							"})",
+							"",
+							"pm.test(\"Check if anything had changed\", function() {",
+							"    body = pm.response.json()",
+							"    pm.expect(body.description).not.eq(null)",
+							"    pm.expect(body.birthDate).not.eq(null)",
+							"})",
+							"",
+							"const patchRequest = {",
+							"  url: 'http://' + pm.collectionVariables.get(\"host.url\"),",
+							"  method: 'PATCH',",
+							"  header: {",
+							"    'Content-Type': 'application/json',",
+							"    'Authorization': 'Bearer ' + pm.environment.get(\"jwttoken\")",
+							"  },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({ ",
+							"        username: pm.variables.replaceIn(\"{{$randomUserName}}\"),",
+							"        description: pm.variables.replaceIn(\"{{$randomLoremSentence}}\"),",
+							"        birthDate: pm.variables.replaceIn(\"{{$randomDatePast}}\") ",
+							"    })",
+							"  }",
+							"};",
+							"",
+							"pm.test(\"Not allowed to update different user\", function() {",
+							"    pm.sendRequest(patchRequest, (error, response) => {",
+							"        pm.expect(response.code).eq(403)",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function pad(n) {",
+							"    return (n < 10) ? (\"0\" + n) : n;",
+							"}",
+							"",
+							"function randomDate(start, end) {",
+							"    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));",
+							"}",
+							"var date = randomDate(new Date(1980, 0, 1), new Date());",
+							"var formattedDate = pad(date.getDate()) + '.' + pad(date.getMonth()+1) + '.' + date.getFullYear();",
+							"",
+							"pm.variables.set(\"randomDate\", formattedDate)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{username}}\",\n    \"description\": \"{{$randomLoremSentence}}\",\n    \"birthDate\": \"{{randomDate}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host.url}}",
+					"host": [
+						"{{host.url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change username",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"new_username\", pm.variables.replaceIn(\"{{$randomUserName}}\"))",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success\", function() {",
+							"    pm.expect(pm.response.code).eq(200)",
+							"})",
+							"",
+							"pm.test(\"Can't get old\", function() {",
+							"    const request = {",
+							"        url: 'http://' + pm.collectionVariables.get(\"host.url\") + \"/?username=\" + pm.environment.get(\"username\"),",
+							"        method: 'GET',",
+							"        header: {",
+							"            'Authorization': 'Bearer ' + pm.environment.get(\"jwttoken\")",
+							"        }",
+							"    }",
+							"    pm.sendRequest(request, (error, response) => {",
+							"        pm.expect(response.code).eq(404)",
+							"    });",
+							"})",
+							"",
+							"pm.test(\"Can get new\", function() {",
+							"    // Update jwt",
+							"    const loginRequest = {",
+							"    url: 'http://' + pm.collectionVariables.get(\"host.url\") + \"/login\",",
+							"    method: 'POST',",
+							"    header: {",
+							"        'Content-Type': 'application/json',",
+							"        'Authorization': 'Bearer ' + pm.environment.get(\"jwttoken\")",
+							"    },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({ ",
+							"            username: pm.environment.get(\"new_username\"),",
+							"            password: pm.environment.get(\"password\"),",
+							"        })",
+							"    }",
+							"    };",
+							"",
+							"    pm.sendRequest(loginRequest, (error, response) => {",
+							"            pm.expect(response.code).eq(200)",
+							"            pm.environment.set(\"jwttoken\", response.text())",
+							"            const request = {",
+							"                url: 'http://' + pm.collectionVariables.get(\"host.url\") + \"/?username=\" + pm.environment.get(\"new_username\"),",
+							"                method: 'GET',",
+							"                header: {",
+							"                    'Authorization': 'Bearer ' + response.text()",
+							"                }",
+							"            }",
+							"            pm.sendRequest(request, (error, response) => {",
+							"                pm.expect(response.code).eq(200)",
+							"                pm.environment.set(\"username\", pm.environment.get(\"new_username\"))",
+							"            })",
+							"    });",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host.url}}/change-username?username={{new_username}}",
+					"host": [
+						"{{host.url}}"
+					],
+					"path": [
+						"change-username"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "{{new_username}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success\", function() {",
+							"    const request = {",
+							"        url: 'http://' + pm.collectionVariables.get(\"host.url\") + \"/login\",",
+							"        method: 'POST',",
+							"        header: {",
+							"            'Content-Type': 'application/json'",
+							"        },",
+							"        body: {",
+							"            mode: 'raw',",
+							"            raw: JSON.stringify({ ",
+							"                username: pm.environment.get(\"username\"),",
+							"                password: pm.environment.get(\"password\")",
+							"            })",
+							"        }",
+							"    }",
+							"    ",
+							"    pm.sendRequest(request, (error, response) => {",
+							"        pm.expect(response.code).eq(403) // Can't login",
+							"    })",
+							"",
+							"    request.body = {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({ ",
+							"            username: pm.environment.get(\"username\"),",
+							"            password: pm.environment.get(\"new_password\")",
+							"        })",
+							"    }",
+							"",
+							"    pm.sendRequest(request, (error, response) => {",
+							"        pm.expect(response.code).eq(200) // Can login with new password",
+							"        pm.environment.set(\"password\", pm.environment.get(\"new_password\"))",
+							"    })",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"new_password\", pm.variables.replaceIn(\"{{$randomPassword}}\"))",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host.url}}/change-password?password={{new_password}}",
+					"host": [
+						"{{host.url}}"
+					],
+					"path": [
+						"change-password"
+					],
+					"query": [
+						{
+							"key": "password",
+							"value": "{{new_password}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.code).eq(200)",
+							"    pm.sendRequest(pm.collectionVariables.get(\"host.url\") + \"/?username=\" + pm.environment.get(\"username\"), (error, response) => {",
+							"        pm.expect(response.code).eq(403) // 403 since we can't pass Auth Service Password validation",
+							"    });",
+							"})",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host.url}}/delete",
+					"host": [
+						"{{host.url}}"
+					],
+					"path": [
+						"delete"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwttoken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host.url",
+			"value": "arch.homework",
+			"type": "string"
+		},
+		{
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "username",
+			"value": ""
+		}
+	]
+}
