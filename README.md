@@ -143,7 +143,7 @@ sequenceDiagram
     Gateway->>+Authentication Service: POST /change-username?username={new-username}
     alt Bad credentials
     Authentication Service->>Gateway: 403 Forbidden
-    Gateway->>User: 402 Forbidden
+    Gateway->>User: 403 Forbidden
     else Valid credentials
     alt New username is not occupied
     Authentication Service->>+PostgreSQL: [AUTH DB] Update username
@@ -181,7 +181,7 @@ sequenceDiagram
     Gateway->>+Authentication Service: POST /change-password?password={new-password}
     alt Bad credentials
     Authentication Service->>Gateway: 403 Forbidden
-    Gateway->>User: 402 Forbidden
+    Gateway->>User: 403 Forbidden
     else Valid credentials
     Authentication Service->>+PostgreSQL: [AUTH DB] Update password
     PostgreSQL->>-Authentication Service: 1
