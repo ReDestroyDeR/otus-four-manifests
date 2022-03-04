@@ -31,10 +31,6 @@ spec:
             prefix: "/delete"
           method:
             exact: "DELETE"
-        - uri:
-            prefix: "/.well-known/jwks.json"
-          method:
-            exact: "GET"
       route:
         - destination:
             host: auth-service.otus-four.svc.cluster.local
